@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="Lab23" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/Lab23" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/Lab23" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+			<Target title="C">
+				<Option output="bin/C/Lab23" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/C/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="A">
+				<Option output="bin/A/Lab23" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/A/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="B">
+				<Option output="bin/B/Lab23" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/B/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Unit filename="main.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="matrix_a.c">
+			<Option compilerVar="CC" />
+			<Option target="A" />
+		</Unit>
+		<Unit filename="matrix_abc.h" />
+		<Unit filename="matrix_b.c">
+			<Option compilerVar="CC" />
+			<Option target="B" />
+		</Unit>
+		<Unit filename="matrix_c.c">
+			<Option compilerVar="CC" />
+			<Option target="Debug" />
+			<Option target="Release" />
+			<Option target="C" />
+		</Unit>
+		<Unit filename="matrix_init.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="matrix_init.h" />
+		<Unit filename="matrix_operations.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="matrix_operations.h" />
+		<Unit filename="matrix_problems.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="matrix_problems.h" />
+		<Extensions>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
