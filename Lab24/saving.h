@@ -2,15 +2,14 @@
 #define SAVING_H_INCLUDED
 #include "database.h"
 
-/** Заполняет массив структур street из файла, созданного с помощью функции saving
- *  len - адрес переменной, в которую запишется длинна массива
+/** Заполняет базу данных list из файла, созданного с помощью функции saving
  *  filename - имя файла, из которого заполнять
- *  Возвращает указатель на массив или NULL в случае ошибки
+ *  Возвращает 1 в случае ошибки, иначе 0
  */
-street * loading(size_t *len, const char *filename);
+int loading (dtb *list, const char *filename);
 
 
-/** Сохраняет в файл с именем filename данные из массива list длины len */
-void saving (street *list, size_t len, const char *filename);
+/** Сохраняет в файл с именем filename данные из базы данных list */
+void saving (dtb list, const char *filename);
 
 #endif // SAVING_H_INCLUDED

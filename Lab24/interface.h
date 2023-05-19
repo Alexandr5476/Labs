@@ -3,64 +3,11 @@
 #include "database.h"
 #include <stdio.h>
 
-typedef int (*fnc_comp) (void *, void *);
-
-typedef double (*fnc_divide) (street *, street *);
-
-typedef double (*fnc_sum) (street *, size_t len);
-
-typedef double (*fnc_divide_num) (street *, double);
-
-
-/** Очищает графическое окно, выводит массив структур list длинны len
- *  в виде таблицы, рисует кнопки "закрыть", "сохранить", "сохранить как"
- *  и кнопку "+" - добавление нового элемента в массив
+/** Очищает графическое окно, выводит базу данных list в виде таблицы
+ *  рисует кнопки "закрыть", "сохранить", "сохранить как"
+ *  и кнопку "+" - добавление нового элемента в базу даныых
  */
-void table (street *list, size_t len);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю length
- *  Возвращает 1, если a > b, иначе 0
- */
-int cmp_length_incr (void *a, void *b);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю houses
- *  Возвращает 1, если a > b, иначе 0
- */
-int cmp_houses_incr (void *a, void *b);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю name
- *  Возвращает 1, если a раньше в алфавите, чем b, иначе 0
- */
-int cmp_name_incr (void *a, void *b);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю length
- *  Возвращает 1, если a < b, иначе 0
- */
-int cmp_length_decr (void *a, void *b);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю houses
- *  Возвращает 1, если a < b, иначе 0
- */
-int cmp_houses_decr (void *a, void *b);
-
-
-/** Сравнивает структуры a и b (тип данных - street) по полю name
- *  Возвращает 1, если a раньше в алфавите, чем b, иначе 0
- */
-int cmp_name_decr (void *a, void *b);
-
-
-/** Сортирует массив любого типа данных
- *  array - указатель на массив, len - длинна массива, size - размер одного элемента массива
- *  cmp - функция сравнения двух элементов массива
- *  если cmp возвращает 1, когда первый элемент больше, то массив будет отсортирован по возрастанию, иначе по убыванию
- */
-void sort(void *array, size_t len, size_t size, fnc_comp cmp);
+void table (dtb list);
 
 
 /** Ввод названия улицы в таблицу в графическом окне
@@ -96,55 +43,24 @@ double input_houses (int left, int top, int right , int bottom);
 char * input_filename ();
 
 
-/** Возвращает максимальный элемент в массиве list длины len
- *  cmp - функция сравнения двух элементов, которая должна
- *  возвращать 1, если a < b, иначе 0
- */
-street * maximum (street *list, size_t len, fnc_comp cmp);
-
-
-/** Возвращает сумму чисел из полей length элементов массива list длины len */
-double sum_length (street *list, size_t len);
-
-
-/** Возвращает сумму чисел из полей houses элементов массива list длины len */
-double sum_houses (street *list, size_t len);
-
-
-/** Возвращает результат деления чисел из полей houses структур а и b */
-double divide_houses (street *a, street *b);
-
-
-/** Возвращает результат деления чисел из полей length структур а и b */
-double divide_length (street *a, street *b);
-
-
-/** Возвращает результат деления чисела из поля houses структуры a на число b */
-double divide_houses_num (street *a, double b);
-
-
-/** Возвращает результат деления чисела из поля length структуры a на число b */
-double divide_length_num (street *a, double b);
-
-
-/** Рисует столбчатую диаграмму по элеметам массива list длины len
- *  cmp - функция сравнения двух элементов массива (возвращает 1, если a < b, иначе 0)
+/** Рисует столбчатую диаграмму по элеметам базы данных list
+ *  cmp - функция сравнения двух элементов массива list.street_list (возвращает 1, если a < b, иначе 0)
  *  div - функция деления двух элементов массива
  */
-void bar_chart(street *list, size_t len, fnc_comp cmp, fnc_divide div);
+void bar_chart(dtb list, fnc_comp cmp, fnc_divide div);
 
 
-/** Рисует круговую диаграмму по элеметам массива list длины len
- *  list_sum - функция суммирования всех элементов массива
+/** Рисует круговую диаграмму по элеметам базы данных list
+ *  list_sum - функция суммирования всех элементов массива list.street_list
  *  div - функция деления элемента массива на вещественное число
  */
-void pie_chart(street *list, size_t len, fnc_sum list_sum, fnc_divide_num div);
+void pie_chart(dtb list, fnc_sum list_sum, fnc_divide_num div);
 
 
-/** Работа с массивом list длинны len_list в гравфическом окне
+/** Работа с базой данных list в графическом окне
  *  Обрабатывает положение и нажатия мыши
- *  filename - имя файла, из которго прочитан массив list
+ *  filename - имя файла, из которго прочитана база данных
  */
-void interface (street *list, size_t len_list, const char *filename);
+void interface (dtb list, const char *filename);
 
 #endif // INTERFACE_H_INCLUDED

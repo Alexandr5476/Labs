@@ -189,10 +189,8 @@ matrix * matrix_transp_squ (matrix *m)
             if (i < j)
             {
                 double *e1 = matrix_get(m, i, j), *e2 = matrix_get(m, j, i), x = *e1;
-                //printf("e1 = %lg, e2 = %lg, x = %lg -> ", *e1, *e2, x);
                 *e1 = *e2;
                 *e2 = x;
-                //printf("e1 = %lg, e2 = %lg, x = %lg\n", *e1, *e2, x);
             }
 
     return m;

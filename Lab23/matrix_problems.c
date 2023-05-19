@@ -220,9 +220,15 @@ matrix * matrix_inverse(const matrix *m)
         }
 
     free(index);
+    matrix_free(m_tmp);
 
     /* Проверка на правильность ответа */
-    m_tmp = matrix_clone(m);
+    if (!(m_tmp = matrix_clone(m)))
+    {
+        matrix_free(r_tmp);
+        return NULL;
+    }
+
     if ((!matrix_multipl(m_tmp, r_tmp)) || (!(check = matrix_alloc_identity(s))))
     {
         matrix_free(m_tmp);
@@ -244,7 +250,7 @@ matrix * matrix_inverse(const matrix *m)
     return r_tmp;
 }
 
-matrix * matrix_exp(const matrix *m)
+matrix * matrix_exp (const matrix *m)
 {
     size_t s = matrix_height(m);
     matrix *e = matrix_alloc_identity(s), *sum = matrix_alloc_identity(s);
@@ -258,10 +264,20 @@ matrix * matrix_exp(const matrix *m)
 
     for (int n = 1; matrix_norm(e) > 0.001; ++n)
     {
-        matrix_multipl(e, m);
+        if (!matrix_multipl(e, m))
+        {
+            matrix_free(e);
+            matrix_free(sum);
+            return NULL;
+        }
         matrix_multipl_scal(e, 1. / n);
 
-        matrix_add(sum, e);
+        if (!matrix_add(sum, e))
+        {
+            matrix_free(e);
+            matrix_free(sum);
+            return NULL;
+        }
     }
 
     matrix_free(e);

@@ -1,14 +1,15 @@
 #include "interface.h"
 #include "database.h"
 #include "saving.h"
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <graphics.h>
 
-void table (street *list, size_t len)
+void table (dtb list)
 {
-    int cur_pos = 30, bottom = (len + 1) * 28, i = 1, maxx = getmaxx(), width, end;
+    int cur_pos = 30, bottom = (list.len + 1) * 28, i = 1, maxx = getmaxx(), width, end;
     char str[20];
 
     cleardevice();
@@ -50,7 +51,7 @@ void table (street *list, size_t len)
     outtextxy(end - width - 5, 15, "Сохранить");
 
     /* Таблица */
-    for (street *l = list, *e = list + len; l < e; ++l, ++i)
+    for (street *l = list.street_list, *e = l + list.len; l < e; ++l, ++i)
     {
         cur_pos += 6;
 
@@ -78,70 +79,16 @@ void table (street *list, size_t len)
     outtextxy(42, cur_pos + 6, "+");
 }
 
-int cmp_length_incr (void *a, void *b)
-{
-    return ((street*)a)->length > ((street*)b)->length;
-}
 
-int cmp_houses_incr (void *a, void *b)
-{
-    return ((street*)a)->houses > ((street*)b)->houses;
-}
-
-int cmp_name_incr (void *a, void *b)
-{
-    char *x = (((street*)a)->name), *y = (((street*)b)->name);
-    for (; *x && *y; ++x, ++y) if (*x != *y) return *x > *y;
-    return *x > *y;
-}
-
-int cmp_length_decr (void *a, void *b)
-{
-    return ((street*)a)->length < ((street*)b)->length;
-}
-
-int cmp_houses_decr (void *a, void *b)
-{
-    return ((street*)a)->houses < ((street*)b)->houses;
-}
-
-int cmp_name_decr (void *a, void *b)
-{
-    char *x = (((street*)a)->name), *y = (((street*)b)->name);
-    for (; *x && *y; ++x, ++y) if (*x != *y) return *x < *y;
-    return *x < *y;
-}
-
-void sort(void *array, size_t len, size_t size, fnc_comp cmp)
-{
-    void *t = malloc(size);
-    if (!t) exit(-1);
-    char *i, *j, *e2 = array + len * size, *e1 = e2 - size;
-
-    for (i = (char*) array; i < e1; i += size)
-    {
-        char *k = i;
-
-        for (j = i + size; j < e2; j += size) if (cmp(k, j)) k = j;
-
-        if (k != i)
-        {
-            memcpy (t, k, size);
-            memcpy (k, i, size);
-            memcpy (i, t, size);
-        }
-    }
-
-    free(t);
-}
 
 char * input_name (int left, int top, int right , int bottom)
 {
     char in, *str = NULL, *s, letter[2];
     int input_pos = left + 10, len = 0;
+
     setfillstyle(SOLID_FILL, BLACK);
-    setcolor(WHITE);
     setlinestyle(0, 0, THICK_WIDTH);
+    setcolor(WHITE);
     bar(left, top, right, bottom);
     rectangle(left, top, right, bottom);
 
@@ -155,8 +102,11 @@ char * input_name (int left, int top, int right , int bottom)
                 return NULL;
 
             case KEY_ENTER:
-                str[len] = '\0';
-                return str;
+                if (len)
+                {
+                    str[len] = '\0';
+                    return str;
+                }
 
             case KEY_BACK:
                 if (len)
@@ -174,10 +124,12 @@ char * input_name (int left, int top, int right , int bottom)
                     if (str) free(str);
                     return NULL;
                 }
+
                 *letter = in;
                 letter[1] = '\0';
                 settextstyle(0, 0, 5);
                 outtextxy(input_pos, top + 5, letter);
+
                 str = s;
                 str[len] = in;
                 ++len;
@@ -191,9 +143,10 @@ double input_length (int left, int top, int right , int bottom)
     char in, *str = NULL, *s, letter[2];
     int input_pos = left + 10, len = 0;
     double out;
+
     setfillstyle(SOLID_FILL, BLACK);
-    setcolor(WHITE);
     setlinestyle(0, 0, THICK_WIDTH);
+    setcolor(WHITE);
     bar(left, top, right, bottom);
     rectangle(left, top, right, bottom);
 
@@ -207,10 +160,13 @@ double input_length (int left, int top, int right , int bottom)
                 return 0/0.;
 
             case KEY_ENTER:
-                str[len] = '\0';
-                sscanf(str, "%lf", &out);
-                free(str);
-                return out;
+                if (len)
+                {
+                    str[len] = '\0';
+                    sscanf(str, "%lf", &out);
+                    free(str);
+                    return out;
+                }
 
             case KEY_BACK:
                 if (len)
@@ -230,10 +186,12 @@ double input_length (int left, int top, int right , int bottom)
                         if (str) free(str);
                         return 0/0.;
                     }
+
                     *letter = in;
                     letter[1] = '\0';
                     settextstyle(0, 0, 5);
                     outtextxy(input_pos, top + 5, letter);
+
                     str = s;
                     str[len] = in;
                     ++len;
@@ -247,9 +205,10 @@ double input_houses (int left, int top, int right , int bottom)
 {
     char in, *str = NULL, *s, letter[2];
     int input_pos = left + 10, len = 0, out;
+
     setfillstyle(SOLID_FILL, BLACK);
-    setcolor(WHITE);
     setlinestyle(0, 0, THICK_WIDTH);
+    setcolor(WHITE);
     bar(left, top, right, bottom);
     rectangle(left, top, right, bottom);
 
@@ -263,10 +222,13 @@ double input_houses (int left, int top, int right , int bottom)
                 return -1;
 
             case KEY_ENTER:
-                str[len] = '\0';
-                sscanf(str, "%d", &out);
-                free(str);
-                return out;
+                if (len)
+                {
+                    str[len] = '\0';
+                    sscanf(str, "%d", &out);
+                    free(str);
+                    return out;
+                }
 
             case KEY_BACK:
                 if (len)
@@ -286,10 +248,12 @@ double input_houses (int left, int top, int right , int bottom)
                         if (str) free(str);
                         return -1;
                     }
+
                     *letter = in;
                     letter[1] = '\0';
                     settextstyle(0, 0, 5);
                     outtextxy(input_pos, top + 5, letter);
+
                     str = s;
                     str[len] = in;
                     ++len;
@@ -317,8 +281,11 @@ char * input_filename ()
                 return NULL;
 
             case KEY_ENTER:
-                str[len] = '\0';
-                return str;
+                if (len)
+                {
+                    str[len] = '\0';
+                    return str;
+                }
 
             case KEY_BACK:
                 if (len)
@@ -336,10 +303,12 @@ char * input_filename ()
                     if (str) free(str);
                     return NULL;
                 }
+
                 *letter = in;
                 letter[1] = '\0';
                 settextstyle(0, 0, 5);
                 outtextxy(input_pos, 60, letter);
+
                 str = s;
                 str[len] = in;
                 ++len;
@@ -348,54 +317,7 @@ char * input_filename ()
     }
 }
 
-street * maximum (street *list, size_t len, fnc_comp cmp)
-{
-    street *max = list;
-    for (street *p = list, *e = list + len; p < e; ++p)
-        if (cmp(max, p)) max = p;
-
-    return max;
-}
-
-double sum_length (street *list, size_t len)
-{
-    double sum = 0;
-    for (street *p = list, *e = list + len; p < e; ++p)
-        sum += p->length;
-
-    return sum;
-}
-
-double sum_houses (street *list, size_t len)
-{
-    double sum = 0;
-    for (street *p = list, *e = list + len; p < e; ++p)
-        sum += p->houses;
-
-    return sum;
-}
-
-double divide_houses (street *a, street *b)
-{
-    return ((double)(a->houses) / b->houses);
-}
-
-double divide_length (street *a, street *b)
-{
-    return ((double)(a->length) / b->length);
-}
-
-double divide_houses_num (street *a, double b)
-{
-    return ((a->houses) / b);
-}
-
-double divide_length_num (street *a, double b)
-{
-    return ((a->length) / b);
-}
-
-void bar_chart(street *list, size_t len, fnc_comp cmp, fnc_divide div)
+void bar_chart (dtb list, fnc_comp cmp, fnc_divide div)
 {
     int chart_height = 200, chart_buttom = 600, column_pos = 600, *c, i = 1, color[] = {BLUE, GREEN, CYAN, RED, MAGENTA,
                                                                                   BROWN, LIGHTGRAY, DARKGRAY, LIGHTBLUE,
@@ -405,9 +327,9 @@ void bar_chart(street *list, size_t len, fnc_comp cmp, fnc_divide div)
     setfillstyle(SOLID_FILL, BLACK);
     bar(column_pos, chart_buttom - chart_height, getmaxx(), chart_buttom + 20);
 
-    street *max = maximum(list, len, cmp);
+    street *max = maximum(list, cmp);
     c = color;
-    for (street *p = list, *e = list + len; p < e; ++p, ++c, ++i)
+    for (street *p = list.street_list, *e = p + list.len; p < e; ++p, ++c, ++i)
     {
         int column_height = (int) (chart_height * div(p, max));
 
@@ -423,31 +345,32 @@ void bar_chart(street *list, size_t len, fnc_comp cmp, fnc_divide div)
     }
 }
 
-void pie_chart(street *list, size_t len, fnc_sum list_sum, fnc_divide_num div)
+void pie_chart (dtb list, fnc_sum list_sum, fnc_divide_num div)
 {
-    int x = 850, y = 200, radius = 120, *c, beg_angle = 0, color[] = {BLUE, GREEN, CYAN, RED, MAGENTA,
-                                                                                  BROWN, LIGHTGRAY, DARKGRAY, LIGHTBLUE,
-                                                                                  LIGHTCYAN, LIGHTRED, YELLOW, WHITE};
+    int x = 850, y = 200, radius = 120, *c, color[] = {BLUE, GREEN, CYAN, RED, MAGENTA,
+                                                       BROWN, LIGHTGRAY, DARKGRAY, LIGHTBLUE,
+                                                       LIGHTCYAN, LIGHTRED, YELLOW, WHITE};
+    double sum = list_sum(list), beg_angle = 0;
+
     setfillstyle(SOLID_FILL, BLACK);
     bar(x - radius, y - radius, getmaxx(), y + radius);
 
-    double sum = list_sum(list, len);
     c = color;
-    for (street *p = list, *e = list + len - 1; p < e; ++p, ++c)
+    for (street *p = list.street_list, *e = p + list.len - 1; p < e; ++p, ++c)
     {
-        int end_angel = beg_angle + (int) (360 * div(p, sum));
+        double end_angel = beg_angle + (360 * div(p, sum));
 
         setcolor(*c);
-        pieslice(x, y, beg_angle, end_angel, radius);
+        pieslice(x, y, round(beg_angle), round(end_angel), radius);
 
         beg_angle = end_angel;
         if (*c == WHITE) c = color;
     }
     setcolor(*c);
-    pieslice(x, y, beg_angle, 360, radius);
+    pieslice(x, y, round(beg_angle), 360, radius);
 }
 
-void interface (street *list, size_t len, const char *filename)
+void interface (dtb list, const char *filename)
 {
     int gd = CUSTOM, gm = CUSTOM_MODE(1200,700), coord[] = {30, 60, 260, 385, 510}, prev_coord[] = {0, 0, 0, 0},
         order_name = 0, order_houses = 0, order_length = 0, maxx, beg_but1, end_but1, beg_but2, end_but2,
@@ -468,7 +391,7 @@ void interface (street *list, size_t len, const char *filename)
     end_but3 = beg_but2 - 10;
     beg_but3 = end_but3 - 10 - textwidth("Сохранить");
 
-    table(list, len);
+    table(list);
 
     while (1)
     {
@@ -499,21 +422,29 @@ void interface (street *list, size_t len, const char *filename)
             /* Нажатие на кнопку "сохранить как" */
             else if (mouse.y > 10 && mouse.y < 33 && mouse.x > beg_but2 && mouse.x < end_but2)
             {
-                new_filename = input_filename();
-                if (new_filename)
+                if (new_filename) free(new_filename);
+
+                if ((new_filename = input_filename()))
                 {
-                    saving(list, len, new_filename);
+                    saving(list, new_filename);
+                    setfillstyle(SOLID_FILL, BLACK);
+                    bar(515, 60, maxx, 90);
+                    outtextxy(520, 60, "Сохранено");
                 }
-                setfillstyle(SOLID_FILL, BLACK);
-                bar(515, 60, maxx, 90);
-                outtextxy(520, 60, "Сохранено");
+                else
+                {
+                    setfillstyle(SOLID_FILL, BLACK);
+                    bar(515, 60, maxx, 90);
+                    outtextxy(520, 60, "Отмена/ошибка сохранения");
+                }
+
                 delay(3000);
                 bar(515, 60, maxx ,90);
             }
             /* Нажатие на кнопку "сохранить" */
             else if (mouse.y > 10 && mouse.y < 33 && mouse.x > beg_but3 && mouse.x < end_but3)
             {
-                saving(list, len, filename);
+                saving(list, filename);
                 setfillstyle(SOLID_FILL, BLACK);
                 bar(515, 60, maxx, 90);
                 outtextxy(520, 60, "Сохранено");
@@ -529,21 +460,21 @@ void interface (street *list, size_t len, const char *filename)
                     /* Сортировка по убыванию, если было отсортировано по возрастанию и наоборот */
                     if (order_name)
                     {
-                        sort(list, len, sizeof(*list), cmp_name_decr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_name_decr);
                         order_name = 0;
                     }
                     else
                     {
-                        sort(list, len, sizeof(*list), cmp_name_incr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_name_incr);
                         order_name = 1;
                     }
                     delay(500);
-                    table(list, len); // Новая таблица
+                    table(list); // Новая таблица
                     setcolor(WHITE);
                     setlinestyle(0, 0, THICK_WIDTH);
                     /* Выделения столбца */
                     rectangle(*prev_coord = coord[1], prev_coord[1] = 58,
-                              prev_coord[2] = coord[2], prev_coord[3] = 58 + len * 28);
+                              prev_coord[2] = coord[2], prev_coord[3] = 58 + list.len * 28);
                 }
                  /* Нажатие на заголовок столбца с длинной улицы */
                 else if (mouse.x > coord[2] && mouse.x < coord[3])
@@ -551,62 +482,76 @@ void interface (street *list, size_t len, const char *filename)
                     /* Сортировка по убыванию, если было отсортировано по возрастанию и наоборот */
                     if (order_length)
                     {
-                        sort(list, len, sizeof(*list), cmp_length_decr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_length_decr);
                         order_length = 0;
                     }
                     else
                     {
-                        sort(list, len, sizeof(*list), cmp_length_incr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_length_incr);
                         order_length = 1;
 
                     }
                     delay(500);
-                    table(list, len); // Новая таблица
+                    table(list); // Новая таблица
                     setcolor(WHITE);
                     setlinestyle(0, 0, THICK_WIDTH);
                     /* Выделения столбца */
                     rectangle(*prev_coord = coord[2], prev_coord[1] = 58,
-                              prev_coord[2] = coord[3], prev_coord[3] = 58 + len * 28);
+                              prev_coord[2] = coord[3], prev_coord[3] = 58 + list.len * 28);
                 }
-                /* Нажатие на заголовок столбца с количеством домов на улице*/
+                /* Нажатие на заголовок столбца с количеством домов на улице */
                 else if (mouse.x > coord[3] && mouse.x < coord[4])
                 {
                     /* Сортировка по убыванию, если было отсортировано по возрастанию и наоборот */
                     if (order_houses)
                     {
-                        sort(list, len, sizeof(*list), cmp_houses_decr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_houses_decr);
                         order_houses = 0;
                     }
                     else
                     {
-                        sort(list, len, sizeof(*list), cmp_houses_incr);
+                        sort(list.street_list, list.len, sizeof(*list.street_list), cmp_houses_incr);
                         order_houses = 1;
 
                     }
                     delay(500);
-                    table(list, len); // Новая таблица
+                    table(list); // Новая таблица
                     setcolor(WHITE);
                     setlinestyle(0, 0, THICK_WIDTH);
                     /* Выделения столбца */
                     rectangle(*prev_coord = coord[3], prev_coord[1] = 58,
-                              prev_coord[2] = coord[4], prev_coord[3] = 58 + len * 28);
+                              prev_coord[2] = coord[4], prev_coord[3] = 58 + list.len * 28);
                 }
             }
             /* Нажатие на кнопку добавления нового элемента */
-            else if (mouse.y > 58 + len * 28 && mouse.y < 88 + len * 28 && mouse.x > 30 && mouse.x < 60)
+            else if (mouse.y > 58 + list.len * 28 && mouse.y < 88 + list.len * 28 && mouse.x > 30 && mouse.x < 60)
             {
-                char  *name   = input_name  (coord[1], 58 + len * 28, coord[2], 88 + len * 28);
-                double length = input_length(coord[2], 58 + len * 28, coord[3], 88 + len * 28);
-                int    houses = input_houses(coord[3], 58 + len * 28, coord[4], 88 + len * 28);
-                if (name && length == length && houses > 0) list = street_insert(list, len, name, length, houses);
-                ++len;
-                table(list, len);
+                char  *name   = input_name  (coord[1], 58 + list.len * 28, coord[2], 88 + list.len * 28);
+                double length = input_length(coord[2], 58 + list.len * 28, coord[3], 88 + list.len * 28);
+                int    houses = input_houses(coord[3], 58 + list.len * 28, coord[4], 88 + list.len * 28);
+
+                if (name && length == length && houses > 0)
+                {
+                    if (street_insert(&list, name, length, houses))
+                    {
+                        table(list);
+                        outtextxy(coord[1] + 10, 65 + list.len * 28, "Ошибка");
+                        delay(3000);
+                    }
+                }
+                else
+                {
+                    table(list);
+                    outtextxy(coord[1] + 10, 65 + list.len * 28, "Ошибка / отмена");
+                    delay(3000);
+                }
+                table(list);
                 *prev_coord = prev_coord[1] = prev_coord[2] = prev_coord[3] = 0;
             }
             else
             {
                 /* Если нажато на какую-нибудь ячейку таблицы, то выделение этой ячейки */
-                for (int y = 58, end = y + len * 28; y < end; y += 28)
+                for (int y = 58, end = y + list.len * 28; y < end; y += 28)
                 {
                     if (mouse.y > y && mouse.y < y + 28)
                     {
@@ -631,8 +576,6 @@ void interface (street *list, size_t len, const char *filename)
                     }
                 }
             }
-
-            delay(150);
         }
         /* Правая кнопка мыши */
         else if (mouse.buttons == MOUSE_RIGHTBUTTON)
@@ -658,73 +601,82 @@ void interface (street *list, size_t len, const char *filename)
             setlinestyle(0, 0, THICK_WIDTH);
             if (mouse.y > 30 && mouse.y < 58)
             {
-
+                /* Если нажато на заголовок столбца, то вывод диаграмм */
                 if (mouse.x > coord[2] && mouse.x < coord[3])
                 {
-                    bar_chart(list, len, cmp_length_decr, divide_length);
-                    pie_chart(list, len, sum_length, divide_length_num);
+                    bar_chart(list, cmp_length_decr, divide_length);
+                    pie_chart(list, sum_length, divide_length_num);
 
                     setcolor(WHITE);
                     setlinestyle(0, 0, THICK_WIDTH);
                     rectangle(*prev_coord = coord[2], prev_coord[1] = 58,
-                              prev_coord[2] = coord[3], prev_coord[3] = 58 + len * 28);
+                              prev_coord[2] = coord[3], prev_coord[3] = 58 + list.len * 28);
                 }
                 else if (mouse.x > coord[3] && mouse.x < coord[4])
                 {
-                    bar_chart(list, len, cmp_houses_decr, divide_houses);
-                    pie_chart(list, len, sum_houses, divide_houses_num);
+                    bar_chart(list, cmp_houses_decr, divide_houses);
+                    pie_chart(list, sum_houses, divide_houses_num);
 
                     setcolor(WHITE);
                     setlinestyle(0, 0, THICK_WIDTH);
                     rectangle(*prev_coord = coord[3], prev_coord[1] = 58,
-                              prev_coord[2] = coord[4], prev_coord[3] = 58 + len * 28);
+                              prev_coord[2] = coord[4], prev_coord[3] = 58 + list.len * 28);
                 }
             }
-            for (int y = 58, end = y + len * 28; y < end; y += 28, ++i)
+            for (int y = 58, end = y + list.len * 28; y < end; y += 28, ++i)
             {
+                /* Если нажато на номер строки таблицы, то удаление элемента из базы данных */
                 if (mouse.y > y && mouse.y < y + 28)
                 {
                     if (mouse.x > *coord && mouse.x < coord[1])
                     {
-                        street_delete(list, len, i);
-                        --len;
-                        table(list, len);
+                        if (street_delete(&list, i))
+                        {
+                            outtextxy(coord[1] + 10, 65 + list.len * 28, "Ошибка");
+                            delay(3000);
+                            setfillstyle(SOLID_FILL, BLACK);
+                            bar(coord[1] + 10, 65 + list.len * 28, coord[1] + textwidth("Ошибка"),
+                                65 + list.len * 28 + textheight("Ошибка"));
+                        }
+                        else
+                            table(list);
+
                         *prev_coord = prev_coord[1] = prev_coord[2] = prev_coord[3] = 0;
                     }
-
+                    /* Если нажато на какую-нибудь ячейку таблицы, то редактирование этой ячейки */
                     else if (mouse.x > coord[1] && mouse.x < coord[2])
                     {
                         str = input_name(*prev_coord = coord[1], prev_coord[1] = y,
                                          prev_coord[2] = coord[2], prev_coord[3] = y + 28);
-                        if (str) (list + i)->name = str;
-                        table(list, len);
+
+                        if (str)
+                        {
+                            free((list.street_list + i)->name);
+                            (list.street_list + i)->name = str;
+                        }
+                        table(list);
                     }
 
                     else if (mouse.x > coord[2] && mouse.x < coord[3])
                     {
                         length = input_length (*prev_coord = coord[2], prev_coord[1] = y,
                                                prev_coord[2] = coord[3], prev_coord[3] = y + 28);
-                        if (length == length) (list + i)->length = length;
-                        table(list, len);
+                        if (length == length) (list.street_list + i)->length = length;
+                        table(list);
                     }
 
                     else if (mouse.x > coord[3] && mouse.x < coord[4])
                     {
                         houses = input_houses(*prev_coord = coord[3], prev_coord[1] = y,
                                               prev_coord[2] = coord[4], prev_coord[3] = y + 28);
-                        if (houses >= 0) (list + i)->houses = houses;
-                        table(list, len);
+                        if (houses >= 0) (list.street_list + i)->houses = houses;
+                        table(list);
                     }
                     else
                         *prev_coord = prev_coord[1] = prev_coord[2] = prev_coord[3] = 0;
                 }
             }
-            delay(200);
         }
+        delay (150);
     }
 }
-
-
-
-
-

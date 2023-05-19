@@ -1,24 +1,26 @@
 #include <stdio.h>
+#include <locale.h>
 #include "saving.h"
 #include "interface.h"
 
 int main(int argc, char **argv)
 {
-    street *list;
-    size_t len;
+    setlocale (LC_CTYPE, "Russian");
+
+    dtb list = {NULL, 0};
 
     if (argc > 1)
     {
-        if (!(list = loading(&len, argv[1]))) return 1;
+        if (loading(&list, argv[1])) return 1;
 
-        interface(list, len, argv[1]);
+        interface(list, argv[1]);
     }
 
     else
     {
-        if (!(list = loading(&len, "safe.txt"))) return 1;
+        if (loading(&list, "safe.txt")) return 1;
 
-        interface(list, len, "safe.txt");
+        interface(list, "safe.txt");
     }
 
     return 0;
