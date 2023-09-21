@@ -12,8 +12,32 @@
         std::endl << "  Std: " << (y) << std::endl <<                                                      \
         "  Operator: " << oper << std::endl <<                                                             \
         "  Line: " << __LINE__ << std::endl <<                                                             \
-        "  File: " << __FILE__  << std::endl;                                                              \
+        "  File: " << __FILE__ << std::endl;                                                               \
         exit(-1);                                                                                          \
+    }                                                                                                      \
+}
+
+#define IOTEST(x, out, in)                                                                                 \
+{                                                                                                          \
+    std::stringstream ss;                                                                                  \
+    ss << x;                                                                                               \
+    if (ss.str() != out)                                                                                   \
+    {                                                                                                      \
+        std::cout << "Out test error: "                                                                    \
+        << #x << "  ---  " << "'" << ss.str() << "'"                                                       \
+        << "  instead of  " << "'" << out << "'"                                                           \
+        << "  (" << "line: " << __LINE__ << ")"<< std::endl;                                               \
+    }                                                                                                      \
+                                                                                                           \
+    ss.str(in);                                                                                            \
+    complex x_in;                                                                                          \
+    ss >> x_in;                                                                                            \
+    if (x_in != x)                                                                                         \
+    {                                                                                                      \
+        std::cout << "In test error: "                                                                     \
+        << #x << "  ---  " << x_in                                                                         \
+        << "  instead of  " << x                                                                           \
+        << "  (" << "line: " << __LINE__ << ")" << std::endl;                                              \
     }                                                                                                      \
 }
 

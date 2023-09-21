@@ -1,6 +1,9 @@
 #include "complex.h"
 #include <istream>
 #include <ostream>
+#include <cmath>
+#include <vector>
+#include <numbers>
 
 complex::complex (double a, double b): real(a), imag(b) {} // Конструктор
 
@@ -33,9 +36,9 @@ complex& complex::operator -= (const double& b) // Операция -= для вещественного
 
 complex& complex::operator *= (const complex& b) // Операция *= для комплексного типа
 {
-    double save_im = imag, save_re = real;
-    real = save_re * b.real - save_im * b.imag;
-    imag = save_re * b.imag + save_im * b.real;
+    double save_im = imag, save_re = real, b_imag = b.imag, b_real = b.real;
+    real = save_re * b_real - save_im * b_imag;
+    imag = save_re * b_imag + save_im * b_real;
     return *this;
 }
 
@@ -46,7 +49,7 @@ complex& complex::operator *= (const double& b) // Операция *= для вещественного
     return *this;
 }
 
-complex& complex::operator /= (const complex& b) // Операция /= для комплексного типа
+complex& complex::operator /= (const complex b) // Операция /= для комплексного типа
 {
     double save_im = imag, save_re = real;
     real = (save_re * b.real + save_im * b.imag) / (b.real * b.real + b.imag * b.imag);
@@ -132,6 +135,48 @@ complex operator / (const double& a, const complex& b) // Бинарная операция / дл
                     -(a * b.imag) / (b.real * b.real + b.imag * b.imag));
 }
 
+std::vector<complex> complex::sqrt(int n) const
+{
+    double mod = std::sqrt(real * real + imag * imag),
+           arg = std::acos(real / mod);
+
+    mod = std::pow(mod, 1. / n);
+
+    std::vector<complex> array(n);
+    int k = 0;
+    for (auto& i: array)
+    {
+        i = complex(mod * std::cos((arg + 2 * std::numbers::pi * k) / n),
+                    mod * std::sin((arg + 2 * std::numbers::pi * k) / n));
+        ++k;
+    }
+    return array;
+}
+
+complex complex::pow(int n) const
+{
+    complex r(1, 0), x = *this;
+    if (n < 0)
+    {
+        x = 1 / x;
+        n = -n;
+    }
+
+    while (1)
+    {
+        if (n & 1) // Остаток от деления на 2
+            r *= x;
+
+        n >>= 1; // Деление на 2
+        if (!n)
+            break;
+
+        x *= x;
+    }
+
+    return r;
+}
+
 std::istream& operator >> (std::istream& stream, complex& a) // Ввод
 {
     return (stream >> a.real >> a.imag);
@@ -141,6 +186,8 @@ std::ostream& operator << (std::ostream& stream, const complex& a) // Вывод
 {
     if (a.imag == 0)
         return stream << a.real;
+
+
 
     if (a.imag == 1)
     {
@@ -157,6 +204,9 @@ std::ostream& operator << (std::ostream& stream, const complex& a) // Вывод
                 return stream << "-i";
             return stream << a.real << " - i";
         }
+
+        if (a.real == 0)
+            return stream << a.imag << "i";
 
         return stream << a.real << " - " << -a.imag << "i";
     }

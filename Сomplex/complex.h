@@ -4,6 +4,7 @@
 #include <istream>
 #include <ostream>
 #include <cmath>
+#include <vector>
 
 class complex
 {
@@ -16,7 +17,7 @@ public:
     complex& operator -= (const  double& b); // Операция -= для вещественного типа
     complex& operator *= (const complex& b); // Операция *= для комплексного  типа
     complex& operator *= (const  double& b); // Операция *= для вещественного типа
-    complex& operator /= (const complex& b); // Операция /= для комплексного  типа
+    complex& operator /= (const complex  b); // Операция /= для комплексного  типа
     complex& operator /= (const  double& b); // Операция /= для вещественного типа
 
     complex operator + (const complex& b) const; // Бинарная операция + для комплексного  типа
@@ -33,18 +34,24 @@ public:
     friend complex operator * (const  double& a, const complex& b); // Бинарная операция * для вещественного типа c другой стороны
     friend complex operator / (const  double& a, const complex& b); // Бинарная операция / для вещественного типа c другой стороны
 
-    complex operator +() {return *this;} // Унарный +
+    const complex& operator +() const {return *this;} // Унарный +
     complex operator -() const {return complex(-real, -imag);} // Унарный -
 
     bool operator == (const complex& b) const {return real == b.real && imag == b.imag;} // Операция == для комплексного  типа
     bool operator == (const double& b)  const {return real == b      && imag == 0     ;} // Операция == для вещественного типа
     friend bool operator == (const double& a, const complex b) {return  b.real == a && b.imag == 0;} // Операция == для вещественного типа c другой стороны
 
+    bool operator != (const complex& b) const {return real != b.real || imag != b.imag;} // Операция == для комплексного  типа
+    bool operator != (const double& b)  const {return real != b      || imag != 0     ;} // Операция == для вещественного типа
+    friend bool operator != (const double& a, const complex b) {return  b.real != a || b.imag != 0;} // Операция == для вещественного типа c другой стороны
+
     double getre () const {return real;} // Геттер вещественной части
     double getim () const {return imag;} // Геттер мнимой части
 
-    double abs () const {return sqrt(real * real + imag * imag);} // Модуль
+    double abs () const {return std::sqrt(real * real + imag * imag);} // Модуль
     complex conj () const {return complex (real, -imag);}; // Сопряжённое
+    complex pow(int n = 2) const; // Возведение в целую степень
+    std::vector<complex> sqrt(int n = 2) const; // Извлечение корня степени n
 
     friend std::istream& operator >> (std::istream& stream, complex& a); // Ввод
     friend std::ostream& operator << (std::ostream& stream, const complex& a); // Вывод
