@@ -9,13 +9,13 @@ template <class T, size_t N>
 class vector
 {
 public:
-    vector<T, N> (); //  Конструктор по умолчанию
+    vector (); //  Конструктор по умолчанию
     vector (const T array[]); // Конструктор с аргументами
 
     T& operator [] (size_t i) {return vec[i];} // Операция [] без const
     const T& operator [] (size_t i) const {return vec[i];} // Операция [] с const
 
-    vector<T, N>& operator += (const vector<T, N>& v2); // Операция += для векторного типа
+    vector& operator += (const vector<T, N>& v2); // Операция += для векторного типа
     vector<T, N>& operator -= (const vector<T, N>& v2); // Операция -= для векторного типа
 
     vector<T, N> operator + (const vector<T, N>& v2) const; // Операция + для векторного типа

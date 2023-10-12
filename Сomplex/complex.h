@@ -17,7 +17,7 @@ public:
     complex& operator -= (const  double& b); // Операция -= для вещественного типа
     complex& operator *= (const complex& b); // Операция *= для комплексного  типа
     complex& operator *= (const  double& b); // Операция *= для вещественного типа
-    complex& operator /= (const complex  b); // Операция /= для комплексного  типа
+    complex& operator /= (const complex& b); // Операция /= для комплексного  типа
     complex& operator /= (const  double& b); // Операция /= для вещественного типа
 
     complex operator + (const complex& b) const; // Бинарная операция + для комплексного  типа

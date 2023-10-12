@@ -36,9 +36,9 @@ complex& complex::operator -= (const double& b) // Операция -= для вещественного
 
 complex& complex::operator *= (const complex& b) // Операция *= для комплексного типа
 {
-    double save_im = imag, save_re = real, b_imag = b.imag, b_real = b.real;
-    real = save_re * b_real - save_im * b_imag;
-    imag = save_re * b_imag + save_im * b_real;
+    double r = real * b.real - imag * b.imag;
+    imag = real * b.imag + imag * b.real;
+    real = r;
     return *this;
 }
 
@@ -49,11 +49,11 @@ complex& complex::operator *= (const double& b) // Операция *= для вещественного
     return *this;
 }
 
-complex& complex::operator /= (const complex b) // Операция /= для комплексного типа
+complex& complex::operator /= (const complex& b) // Операция /= для комплексного типа
 {
-    double save_im = imag, save_re = real;
-    real = (save_re * b.real + save_im * b.imag) / (b.real * b.real + b.imag * b.imag);
-    imag = (save_im * b.real - save_re * b.imag) / (b.real * b.real + b.imag * b.imag);
+    double r = (real * b.real + imag * b.imag) / (b.real * b.real + b.imag * b.imag);
+    imag = (imag * b.real - real * b.imag) / (b.real * b.real + b.imag * b.imag);
+    real = r;
     return *this;
 }
 
@@ -135,10 +135,10 @@ complex operator / (const double& a, const complex& b) // Бинарная операция / дл
                     -(a * b.imag) / (b.real * b.real + b.imag * b.imag));
 }
 
-std::vector<complex> complex::sqrt(int n) const
+std::vector<complex> complex::sqrt(int n) const // Извлечение корня степени n
 {
     double mod = std::sqrt(real * real + imag * imag),
-           arg = std::acos(real / mod);
+           arg = std::atan2(imag, real); // atan2 вычисляет угол между двумя векторами
 
     mod = std::pow(mod, 1. / n);
 
@@ -153,7 +153,7 @@ std::vector<complex> complex::sqrt(int n) const
     return array;
 }
 
-complex complex::pow(int n) const
+complex complex::pow(int n) const // Возведение в целую степень
 {
     complex r(1, 0), x = *this;
     if (n < 0)
