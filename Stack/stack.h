@@ -34,6 +34,17 @@ public:
     stack& operator += (stack& b); // Добавить к стеку стек b (следующий узел после последнего будет вершина стека b)
 
     stack operator + (const stack& b) const; // Соединение стеков (у стека a + b вершиной будет вершина a, и последний узел --- послденнйи узел b)
+    
+    stack operator *= (int m); // Умножение на число (добавить стек к себе m раз; если m < 0, то перевёрнутый стек; если m = 0, то очистить стек)
+
+    stack operator * (int m) const {stack r(*this); return r *= m;} // Операция *
+
+    friend stack operator * (int m, const stack& s) {return s * m;} // Операция * с другой стороны
+
+    stack operator /= (int m) // Операция /= (оставляет от стека первую 1/m часть)
+    {if (m < 0) this->reverse(), m = -m; if(!m) return this->clean(); size_t len = this->size(); return this->substack(0, len / m - 1);}
+
+    stack operator / (int m) const {stack r(*this); return r /= m;} // Операция 
 
     bool operator > (const stack& s) const; // Операция > (по количеству элементов в стеке)
 

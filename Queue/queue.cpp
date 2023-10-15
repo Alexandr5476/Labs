@@ -27,6 +27,7 @@ queue& queue::clean () /// Очистка очереди
     return *this;
 }
 
+
 queue& queue::clean (size_t len) /// Удаление len узлов из очереди (len должно быть не больше длины очереди)
 {
     node *n = head, *n_next;
@@ -40,6 +41,7 @@ queue& queue::clean (size_t len) /// Удаление len узлов из очереди (len должно б
     if(!(head = n)) tail = NULL;
     return *this;
 }
+
 
 queue& queue::clean_safe (size_t len) /// Безопасное удаление len узлов из очереди
 {
@@ -62,6 +64,7 @@ queue& queue::clean_safe (size_t len) /// Безопасное удаление len узлов из очере
     head = n;
     return *this;
 }
+
 
 queue& queue::rclean (size_t len) // Удаление последних len узлов (если len больше длины очереди, то удалятся все узлы)
 {
@@ -116,7 +119,8 @@ queue& queue::operator = (queue& orig) /// Операция присваивания
     return *this;
 }
 
-queue& queue::operator = (queue&& orig) //. Операция присваивания по перемещению
+
+queue& queue::operator = (queue&& orig) /// Операция присваивания по перемещению
 {
     this->clean();
 
@@ -127,13 +131,15 @@ queue& queue::operator = (queue&& orig) //. Операция присваивания по перемещению
     return *this;
 }
 
-std::ostream& operator << (std::ostream& stream, queue q) // Вывод
+
+std::ostream& operator << (std::ostream& stream, queue q) /// Вывод
 {
     if (!q.head) stream << "Очередь пустая";
     for (queue::node *n = q.head; n; n = n->next)
         stream << n->element << " ";
     return stream;
 }
+
 
 std::istream& operator >> (std::istream& stream, queue q) /// Ввод
 {
@@ -144,7 +150,7 @@ std::istream& operator >> (std::istream& stream, queue q) /// Ввод
 }
 
 
-queue& queue::operator+= (queue& b) // Добавление очереди b (head останется тем же, tail будет тот, который у очереди b)
+queue& queue::operator+= (queue& b) /// Добавление очереди b (head останется тем же, tail будет тот, который у очереди b)
 {
     if (&b == this)
     {
@@ -162,6 +168,7 @@ queue& queue::operator+= (queue& b) // Добавление очереди b (head останется тем 
     return *this;
 }
 
+
 queue queue::operator + (const queue& b) const /// Соединение очередей (у очереди a + b head будет как у очереди а, tail как b)
 {
     queue q(*this);
@@ -169,6 +176,17 @@ queue queue::operator + (const queue& b) const /// Соединение очередей (у очеред
     do {q.push(n->element);} while ((n = n->next));
     return q;
 }
+
+
+queue queue::operator *= (int m) /// Умножение на число (добавить стек к себе m раз; если m < 0, то перевёрнутый стек; если m = 0, то очистить стек)
+{
+    if (!m) return this->clean();
+    if (m < 0) this->reverse(), m = -m;
+    queue r(*this);
+    for (int i = 1; i < m; ++i) r = r + *this;
+    return (*this = r);
+}
+
 
 bool queue::operator > (const queue& b) const /// Операция > (по количеству элементов)
 {
@@ -183,6 +201,7 @@ bool queue::operator > (const queue& b) const /// Операция > (по количеству элем
     return (n1 && !n2);
 }
 
+
 bool queue::operator >= (const queue& b) const /// Операция > (по количеству элементов)
 {
     node *n1 = head, *n2 = b.head;
@@ -195,6 +214,7 @@ bool queue::operator >= (const queue& b) const /// Операция > (по количеству эле
 
     return ((n1 && !n2) || (!n1 && !n2));
 }
+
 
 bool queue::operator == (const queue& b) const /// Операция == по количеству элементов
 {
@@ -209,6 +229,7 @@ bool queue::operator == (const queue& b) const /// Операция == по количеству эле
     return (!(n1 || n2));
 }
 
+
 queue& queue::push(int e) /// Добавление элемента
 {
     node *n = new node;
@@ -221,6 +242,7 @@ queue& queue::push(int e) /// Добавление элемента
     return *this;
 }
 
+
 queue& queue::pop() /// Удаление элемента
 {
     if (!head) return *this;
@@ -232,6 +254,7 @@ queue& queue::pop() /// Удаление элемента
     return *this;
 }
 
+
 bool queue::comp (const queue& q) const /// Применение операции === ко всем элементам
 {
     node *n1 = head, *n2 = q.head;
@@ -242,6 +265,7 @@ bool queue::comp (const queue& q) const /// Применение операции === ко всем элем
 
     return (!(n1 || n2));
 }
+
 
 queue& queue::reverse () /// Переворот очереди
 {
@@ -259,6 +283,7 @@ queue& queue::reverse () /// Переворот очереди
     
     return *this;
 }
+
 
 queue& queue::mix() // Перемешивание узлов в случайном порядке
 {
@@ -284,6 +309,7 @@ queue& queue::mix() // Перемешивание узлов в случайном порядке
     return *this; 
 }
 
+
 queue& queue::insert (int e, size_t i) /// Вставка элемента по индексу (вставляемый элемент будет иметь этот индекс)
 {
     if (!i) return this->push(e);
@@ -300,6 +326,7 @@ queue& queue::insert (int e, size_t i) /// Вставка элемента по индексу (вставляе
     return *this;
 }
 
+
 queue& queue::insert (int e) /// Вставка элемента после head
 {
     node *new_n = new node;
@@ -311,7 +338,8 @@ queue& queue::insert (int e) /// Вставка элемента после head
     return *this;
 }
 
-queue& queue::insert_safe (int e, size_t i) // Безопасная вставка элемента по индексу
+
+queue& queue::insert_safe (int e, size_t i) /// Безопасная вставка элемента по индексу
 {
     if (!i) return this->insert(e);
 
@@ -333,7 +361,7 @@ queue& queue::insert_safe (int e, size_t i) // Безопасная вставка элемента по ин
 }
 
 
-queue& queue::remove (size_t i) // Удаление элемента по индексу (i не выходит за конец очереди)
+queue& queue::remove (size_t i) /// Удаление элемента по индексу (i не выходит за конец очереди)
 {
     if (!i) return this->pop();
 
@@ -348,7 +376,8 @@ queue& queue::remove (size_t i) // Удаление элемента по индексу (i не выходит за
     return *this;
 }
 
-queue& queue::remove (size_t i, int& e) // Удаление и получение элемента по индексу (i не выходит за конец очереди)
+
+queue& queue::remove (size_t i, int& e) /// Удаление и получение элемента по индексу (i не выходит за конец очереди)
 {
     if (!i) return this->pop(e);
 
@@ -364,7 +393,7 @@ queue& queue::remove (size_t i, int& e) // Удаление и получение элемента по инде
     return *this;
 }
 
-queue& queue::remove_safe (size_t i) // Удаление элемента по индексу (i не выходит за конец очереди)
+queue& queue::remove_safe (size_t i) /// Удаление элемента по индексу (i не выходит за конец очереди)
 {
     if (!i) return this->pop();
     if (!head) return *this;
@@ -387,7 +416,8 @@ queue& queue::remove_safe (size_t i) // Удаление элемента по индексу (i не выход
     return *this;
 }
 
-queue& queue::remove_safe (size_t i, int& e) // Удаление элемента по индексу (i не выходит за конец очереди)
+
+queue& queue::remove_safe (size_t i, int& e) /// Удаление элемента по индексу (i не выходит за конец очереди)
 {
     if (!i) return this->pop(e);
     if (!head) return *this;
@@ -459,7 +489,7 @@ queue& queue::subqueue (size_t beg, size_t end, size_t step) /// Выделение подсо
         delete n;
         cur->next = NULL;
     }
-    this->reverse(); // !?
+    //this->reverse(); // !?
 
     return *this;
 }

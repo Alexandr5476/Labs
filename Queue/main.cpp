@@ -43,14 +43,45 @@ int main()
     assert(!(q >= r)); assert(r >= q);    assert(r >= r);
     assert(!(q == r)); assert(!(r == q)); assert(r == r);
 
+    r.clean();
+    std::cout << "Безопасная вствка элементов: " << r.insert_safe(1, 2).insert_safe(3, 2).insert_safe(-1, 2)
+    .insert_safe(9, 2).insert_safe(2, 0).insert_safe(-5, 10) <<std::endl;
     while (r.is_not_empty())
     {
         int e;
         r.remove_safe(5, e);
-        std::cout << "Безопасно удалён элемент с индексом 5" << "(" << e << ")"<< ": " << r << std::endl;
+        std::cout << "Безопасно удалён элемент с индексом 5" << " (" << e << ")"<< ": " << r << std::endl;
+    } 
+
+    std::cout << "Вствка элементов (push): " << r.push(1).push(3).push(-1).push(9).push(2).push(-5) <<std::endl;
+    while (r.is_not_empty())
+    {
+        int e;
+        r.pop(e);
+        std::cout << "Удаление элемента (pop)" << " (" << e << ")"<< ": " << r << std::endl;
     }
-    std::cout << "Безопасная вствка элементов: " << r.insert_safe(1, 2).insert_safe(3, 2).insert_safe(-1, 2)
-    .insert_safe(9, 2).insert_safe(2, 0).insert_safe(-5, 10) <<std::endl; 
+
+    std::cout << "Вствка элементов в head (insert): " << r.insert(1).insert(3).insert(-1).insert(9).insert(2).insert(-5) <<std::endl;
+    while (r.is_not_empty())
+    {
+        int e;
+        r.remove(e);
+        std::cout << "Удаление элемента из tail (remove)" << " (" << e << ")"<< ": " << r << std::endl;
+    }
+
+    std::cout << "Вствка элементов (insert с указанием индекса): " << r.insert(1, 0).insert(3, 1).insert(-1, 2).insert(9, 3).insert(2, 2).insert(-5, 1) <<std::endl;
+    int t = 5;
+    while (t > 1)
+    {
+        --t;
+        int e;
+        r.remove(2, e);
+        std::cout << "Удаление элемента (remove индекс 2)" << " (" << e << ")"<< ": " << r << std::endl;
+    }
+    int e;
+    r.remove(1, e); std::cout << "Удаление элемента (remove индекс 1)" << " (" << e << ")"<< ": " << r << std::endl;
+    r.remove(0, e); std::cout << "Удаление элемента (remove индекс 0)" << " (" << e << ")"<< ": " << r << std::endl;
+
 
     /* Тесты выделения подстека */
     std::vector<int> a(10);
@@ -116,7 +147,13 @@ int main()
 
     a.clear(); a.insert(a.end(), {3, 0});                         TEST(-7, -23, -3, ss, a);
 
-    std::cout << "Тесты: Success" << std::endl;
+    std::cout << "Тесты: Success" << std::endl << std::endl;
+
+    queue q_new;
+    std::cout << "Умножение на -4 очереди " << (q_new = q_copy) << ":  " << (q_new *= -4) << std::endl;
+    std::cout << "Деление на 3 :  " << (q_new /= 3) << std::endl;
+    r = q_new * 2;
+    std::cout << "Умножение на 2 :  " << r << std::endl;
 
     return 0;
 }

@@ -3,7 +3,6 @@
 
 #include <ostream>
 #include <istream>
-#include <iostream>
 
 class queue
 {
@@ -35,6 +34,17 @@ public:
     queue& operator += (queue& b); // Добавление очереди b (head останется тем же, tail будет тот, который у очереди b)
 
     queue operator + (const queue& b) const; // Соединение очередей (у очереди a + b head будет как у очереди а, tail как b)
+    
+    queue operator *= (int m); // Умножение на число (добавить очередь к себе m раз; если m < 0, то перевёрнутую очередь; если m = 0, то очистить очередь)
+
+    queue operator * (int m) const {queue r(*this); return r *= m;} // Операция *
+
+    friend queue operator * (int m, const queue& s) {return s * m;} // Операция * с другой стороны
+
+    queue operator /= (int m) // Операция /= (оставляет от очереди первую 1/m часть)
+    {if (m < 0) this->reverse(), m = -m; if(!m) return this->clean(); size_t len = this->size(); return this->subqueue(0, len / m - 1);}
+
+    queue operator / (int m) const {queue r(*this); return r /= m;} // Операция /
 
     bool operator > (const queue& b) const; // Операция > (по количеству элементов)
 
@@ -101,9 +111,16 @@ public:
 
     queue& remove_safe (size_t i, int& e); // Безопасное удаление элемента по индексу с получением элемента
 
-    queue& subqueue (size_t beg, size_t end, size_t step); // Выделение подстека
+    queue& subqueue (size_t beg, size_t end, size_t step = 1); // Выделение подстека
 
-    queue& subqueue_safe (long long beg, long long end, long long step); // Выделение подстека с проверками
+    /* отрицательная индексация с другой стороны (-1 --- индекс последнего элемента очереди)
+     * отрицательный шаг --- подочередь начинает выделятся с конца в обратную сторону
+     * если индекс end левее beg, то они меняются местами
+     * если beg указывает за начало, то выделение начинается с вершины очереди
+     * если end указывает за конец очереди, то очередь выделятся до конца
+     * если step = 0, то очередь очищается
+     */
+    queue& subqueue_safe (long long beg, long long end, long long step = 1); // Выделение подстека с проверками
 
 private:
     class node
@@ -117,6 +134,7 @@ private:
     node *head, *tail;
 };
 
+
 /* beg, end, step --- аргументы метода subqueue_safe
  * x --- очередь, для которого вызывается subqueue_safe
  * y --- std::vector с элементами, которые должны быть в подочереди
@@ -126,7 +144,6 @@ private:
    queue copy_s(x), yes;                                               \
    for (auto& i: y)                                                    \
         yes.push(i);                                                   \
-    yes.reverse();                                                     \
                                                                        \
    if (!yes.comp(copy_s.subqueue_safe(beg, end, step)))                \
    {                                                                   \

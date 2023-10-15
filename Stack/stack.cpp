@@ -1,7 +1,6 @@
 #include "stack.h"
 #include <vector>
 #include <time.h>
-#include <iostream>
 
 stack::stack (const stack& orig): top(NULL) /// Конструктор копирования
 {
@@ -205,6 +204,16 @@ stack stack::operator + (const stack& b) const /// Соединение двух стеков
 }
 
 
+stack stack::operator *= (int m) /// Умножение на число (добавить очередь к себе m раз; если m < 0, то перевёрнутую очередь; если m = 0, то очистить очередь)
+{
+    if (!m) return this->clean();
+    if (m < 0) this->reverse(), m = -m;
+    stack r(*this);
+    for (int i = 1; i < m; ++i) r = r + *this;
+    return (*this = r);
+}
+
+
 bool stack::operator > (const stack& s) const /// Операция > (по количеству элементов в стеке)
 {
     node *n1 = top, *n2 = s.top;
@@ -339,7 +348,8 @@ stack& stack::insert (int e, size_t i) /// Вставка элемента по индексу
     return *this;
 }
 
-stack& stack::insert (int e) // Вставка элемента в конец
+
+stack& stack::insert (int e) /// Вставка элемента в конец
 {
     node *new_n = new node; 
     new_n->element = e;
@@ -452,6 +462,7 @@ stack& stack::remove_safe (size_t i) /// Безопасное удаление элемента по индексу
     delete del;
     return *this;
 }
+
 
 stack& stack::remove_safe (size_t i, int& e) /// Безопасное удаление элемента по индексу c получением элемента
 {
