@@ -1,6 +1,7 @@
 #include "stack.h"
 #include <vector>
 #include <time.h>
+#include <iostream>
 
 stack::stack (const stack& orig): top(NULL) /// Конструктор копирования
 {
@@ -33,10 +34,8 @@ stack& stack::clean () /// Очистка стека
 }
 
 
-stack& stack::clean (size_t len) /// Удаление первых len узлов
+stack& stack::clean (size_t len) /// Удаление первых len узлов (len должно быть не больше длины стека)
 {
-    if (!top) return *this;
-
     node *n = top, *n_next;
     for (size_t i = 0; i < len; ++i)
     {
@@ -71,29 +70,26 @@ stack& stack::rclean (size_t len) /// Удаление последних len узлов
 {
     if (!top) return *this;
 
-    if (len == 1) // Отдельно удаляем последний элемент, чтобы не проходить стек лишний раз
+    if (len == 1) // Отдельно удаляем последний элемент, чтобы не проходить стек лишний раз, в этом случае
     {
-        if (!top->next->next)
+        if (!top->next) // Если в стеке один элемент
         {
-            delete top->next;
+            delete top;
             top = NULL;
             return *this;
         }
         node *n = top, *tmp;
         while ((tmp = n->next)->next) n = tmp;
-        node *del = n->next;
+        delete n->next;
         n->next = NULL;
-        delete del;
         return *this; 
     }
 
     size_t size = this->size();
-    if (len > size) return this->clean();
-
-    size_t beg = size - len;
+    if (len >= size) return this->clean();
     
     node *n = top;
-    for (size_t i = 0; i < beg - 1; ++i) n = n->next;
+    for (size_t i = 0; i < size - len - 1; ++i) n = n->next; // Проходим до первого оставляемого узла
 
     node *n_next = n->next;
     n->next = NULL;
@@ -167,9 +163,19 @@ std::istream& operator >> (std::istream& stream, stack& s) /// Ввод
 
 stack& stack::operator += (stack& b) /// Добавление одного стека к другому
 {
+    if (&b == this)
+    {
+        stack b2(b);
+        return b += b2;
+    }
+
     node *n = top, *tmp;
-    while ((tmp = n->next)) n = tmp;
-    n->next = b.top;
+    if (top)
+    {
+        while ((tmp = n->next)) n = tmp;
+        n->next = b.top;
+    }
+    else top = b.top;
     b.top = NULL;
     return *this;
 }
@@ -209,10 +215,7 @@ bool stack::operator > (const stack& s) const /// Операция > (по количеству элем
         n2 = n2->next;
     }
 
-    if (n1 && !n2)
-        return true;
-
-    return false;
+    return (n1 && !n2);
 }
 
 
@@ -226,10 +229,7 @@ bool stack::operator >= (const stack& s) const /// Операция >= (по количеству эл
         n2 = n2->next;
     }
 
-    if ((n1 && !n2) || (!n1 && !n2))
-        return true;
-
-    return false;
+    return ((n1 && !n2) || (!n1 && !n2));
 }
 
 
@@ -243,10 +243,7 @@ bool stack::operator == (const stack& s) const /// Операция == (по количеству эл
         n2 = n2->next;
     }
 
-    if (n1 || n2)
-        return false;
-
-    return true;
+    return (!(n1 || n2));
 }
 
 
@@ -279,10 +276,7 @@ bool stack::comp (const stack& s) const /// Применение операции == ко всем элеме
         if (n1->element != n2->element)
             return false;
 
-    if (n1 || n2)
-        return false;
-
-    return true;
+    return (!(n1 || n2));
 }
 
 
@@ -330,15 +324,33 @@ stack& stack::mix () // Перемешивание стека
 
 stack& stack::insert (int e, size_t i) /// Вставка элемента по индексу
 {
-    node *n = top, *new_n = new node;
+    if (!i) return this->push(e);
 
-    new_n->element = e;
+    node *n = top;
 
-    for (size_t j = 0; j < i - 1; ++j) n = n->next;
+    for (size_t j = 0; j < i - 1; ++j) n = n->next; // Доходим до узла, который будет перед вставляемым
 
-    node *n_next = n->next; // Если вставляют в конец стека, то n->next будет NULL
+    node *n_next = n->next, // Если вставляют в конец стека, то n->next будет NULL
+         *new_n = new node;
     n->next = new_n;
     new_n->next = n_next;
+    new_n->element = e;
+
+    return *this;
+}
+
+stack& stack::insert (int e) // Вставка элемента в конец
+{
+    node *new_n = new node; 
+    new_n->element = e;
+
+    if (!top) top = new_n;
+    else
+    {
+        node *n = top, *tmp = n;
+        while ((tmp = n->next)) n = tmp;
+        n->next = new_n;
+    }
 
     return *this;
 }
@@ -346,12 +358,18 @@ stack& stack::insert (int e, size_t i) /// Вставка элемента по индексу
 
 stack& stack::insert_safe (int e, size_t i) /// Безопасная вставка элемента по индексу
 {
+    if (!i) return this->push(e);
     node *n = top, *new_n = new node, *tmp = n;
 
     new_n->element = e;
 
-    for (size_t j = 0; (tmp = n->next) && (j < i - 1); ++j) n = tmp;
-
+    if (n) for (size_t j = 0; (tmp = n->next) && (j < i - 1); ++j) n = tmp; // Если стек не пустой, то доходим до узла, который будет перед вставляемым
+    else 
+    {
+        top = new_n;
+        return *this;
+    }
+    
     node *n_next = n->next; // Если вставляют в конец стека, то n->next будет NULL
     n->next = new_n;
     new_n->next = n_next;
@@ -360,13 +378,35 @@ stack& stack::insert_safe (int e, size_t i) /// Безопасная вставка элемента по и
 }
 
 
+stack& stack::remove (int& e) /// Удаление и получение элемента из конца
+{
+    if (!top) return *this; 
+
+    node *n = top, *tmp;
+
+    if (top->next) while ((tmp = n->next)->next) n = tmp; // Если в стеке больше одного элемента, то доходим до предпоследнего
+    else
+    {
+        e = top->element;
+        delete top;
+        top = NULL;
+        return *this;
+    }
+    node *del = n->next;
+    n->next = NULL;
+    e = del->element;
+    delete del;
+    return *this;
+}
+
+
 stack& stack::remove (size_t i) /// Удаление элемента по индексу
 {
-    if (!top) return *this; // Если стек пустой
+    if (!i) return this->pop();
 
     node *n = top;
 
-    for (size_t j = 0; j < i - 1; ++j) n = n->next;
+    for (size_t j = 0; j < i - 1; ++j) n = n->next; // Доходим до элемента перед удаляемым
 
     node *del = n->next;
     n->next = del->next;
@@ -375,17 +415,64 @@ stack& stack::remove (size_t i) /// Удаление элемента по индексу
 }
 
 
+stack& stack::remove (size_t i, int& e) /// Удаление и получение элемента по индексу
+{
+    if (!i) return this->pop(e);
+
+    node *n = top;
+
+    for (size_t j = 0; j < i - 1; ++j) n = n->next; // Доходим до элемента перед удаляемым
+
+    node *del = n->next;
+    n->next = del->next;
+    e = del->element;
+    delete del;
+    return *this;
+}
+
+
 stack& stack::remove_safe (size_t i) /// Безопасное удаление элемента по индексу
 {
-    if (!top) return *this; // Если стек пустой
+    if (!i) return this->pop();
+    if (!top) return *this;
+
+    node *n = top, *tmp = n;
+    
+    /* Если в стеке больше одного элемента, то доходим до того, который перед удаляемым, или до предпоследнего */
+    if (top->next) for (size_t j = 0; ((tmp = n->next)->next) && (j < i - 1); ++j) n = tmp;
+    else
+    {
+        delete top;
+        top = NULL;
+        return *this;
+    }
+
+    node *del = n->next;
+    n->next = del->next; // Если удаляемый элемент последний, то n->next станет NULL
+    delete del;
+    return *this;
+}
+
+stack& stack::remove_safe (size_t i, int& e) /// Безопасное удаление элемента по индексу c получением элемента
+{
+    if (!i) return this->pop(e);
+    if (!top) return *this; 
 
     node *n = top, *tmp = n;
 
-    for (size_t j = 0; ((tmp = n->next)->next) && (j < i - 1); ++j) n = tmp;
+    /* Если в стеке больше одного элемента, то доходим до того, который перед удаляемым, или до предпоследнего */
+    if (top->next) for (size_t j = 0; ((tmp = n->next)->next) && (j < i - 1); ++j) n = tmp;
+    else
+    {
+        e = top->element;
+        delete top;
+        top = NULL;
+        return *this;
+    }
 
     node *del = n->next;
-    if (del) n->next = del->next;
-    else n->next = NULL;
+    n->next = del->next; // Если удаляемый элемент последний, то n->next станет NULL
+    e = del->element;
     delete del;
     return *this;
 }

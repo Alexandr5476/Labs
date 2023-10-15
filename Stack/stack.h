@@ -21,7 +21,7 @@ public:
 
     stack& clean_safe (size_t len); // Удаление первых len узлов с проверкой (если lеn больше длины стека, то удалится все узлы)
 
-    stack& rclean (size_t len); // Удаление последних len узлов (если len больше длины стека, то удалится все узлы)
+    stack& rclean (size_t len); // Удаление последних len узлов (если len больше длины стека, то удалятся все узлы)
 
     stack& operator = (const stack& orig); // Операция присваивания
 
@@ -47,13 +47,17 @@ public:
 
     bool is_empty () {if (top) return false; return true;} // Проверка на пустоту
 
-    int& get_front () const {return top->element;} // Получение элемента из вершины
+    bool is_not_empty () {if (top) return true; return false;} // !is_empty
+
+    int& get_front () {return top->element;} // Получение элемента из вершины
+
+    int get_front () const {return top->element;} // Получение элемента из вершины (const)
 
     stack& push (int e); // Добавление элемента
 
     stack& pop (); // Удаление элемента
 
-    stack& pop (int& e) {e = this->get_front(); return this->pop();} // Получение и удаление элемента
+    stack& pop (int& e) {if (top) e = top->element; return this->pop();} // Получение и удаление элемента
 
     size_t size () const {size_t i = 0; for (node *n = top; n; n = n->next) ++i; return i;} // Количесво элементов в стеке
 
@@ -65,29 +69,43 @@ public:
 
     /** Методы с индексами. Индекс вершины --- 0 */
 
-    int& operator [] (size_t i) const {node *n = top; for (size_t j = 0; j < i; ++j) n = n->next; return n->element;} // Доступ к элементу по индексу
-    
-    /* Доступ к элементу по индексу c проверкой (если индекс выходит за конец стека, то вернётся последний элемент) */
-    int& operator () (size_t i) const {node *n = top, *tmp = top; for (size_t j = 0; (tmp = n -> next) && (j < i); ++j) n = tmp; return n->element;}
+    int& operator [] (size_t i) {node *n = top; for (size_t j = 0; j < i; ++j) n = n->next; return n->element;} // Доступ к элементу по индексу
 
-    stack& insert (int e, size_t); // Вставка элемента по индексу (вставляемый элемент будет иметь этот индекс)
+    int operator [] (size_t i) const {node *n = top; for (size_t j = 0; j < i; ++j) n = n->next; return n->element;} // Доступ к элементу по индексу (const)
+
+    int& operator () () {node *n = top, *tmp; while ((tmp = n -> next)) n = tmp; return n->element;} // Получение последнего элемента
+
+    int operator () () const {node *n = top, *tmp; while ((tmp = n -> next)) n = tmp; return n->element;} // Получение последнего элемента (const)
+
+    /* Доступ к элементу по индексу c проверкой (если индекс выходит за конец стека, то вернётся последний элемент) */
+    int& operator () (size_t i) {node *n = top, *tmp = top; for (size_t j = 0; (tmp = n -> next) && (j < i); ++j) n = tmp; return n->element;}
+
+    int operator () (size_t i) const {node *n = top, *tmp = top; for (size_t j = 0; (tmp = n -> next) && (j < i); ++j) n = tmp; return n->element;}
+
+    stack& insert (int e, size_t i); // Вставка элемента по индексу (вставляемый элемент будет иметь этот индекс)
+
+    stack& insert (int e); // Вставка элемента в конец
 
     stack& insert_safe (int e, size_t i); // Вставка элемента по индексу с проверкой (если индекс выходит за конец стека, то элемент вставится в конец)
 
+    stack& remove () {return this->rclean(1);}; // Удаление элемента из конца
+
+    stack& remove (int& e); // Удаление и получение элемента из конца
+
     stack& remove (size_t i); // Удаление элемента по индексу
 
-    stack& remove (size_t i, int& e) {e = top->element; return this->remove(i);} // Удаление элемента по индексу с получением элемента
+    stack& remove (size_t i, int& e); // Удаление элемента по индексу с получением элемента
 
     stack& remove_safe (size_t i); // Удаление элемента по индексу с проверкой (если индекс выходит за конец стека, то удалится последний элемент)
 
-    stack& remove_safe (size_t i, int& e) {e = top->element; return this->remove_safe(i);} // Безопасное удаление элемента по индексу с получением элемента
+    stack& remove_safe (size_t i, int& e); // Безопасное удаление элемента по индексу с получением элемента
 
     stack& substack (size_t beg, size_t end, size_t step = 1); // Выделение подстека (индексы beg и end должны быть внутри стека)
 
     /* отрицательная индексация с другой стороны (-1 --- индекс последнего элемента стека)
      * отрицательный шаг --- подстек начинает выделятся с конца в обратную сторону
      * если индекс end левее beg, то они меняются местами
-     * если beg указывает за начало, ты выделение начинается с вершины стека
+     * если beg указывает за начало, то выделение начинается с вершины стека
      * если end указывает за конец стека, то стек выделятся до конца
      * если step = 0, то стек очищается
      */

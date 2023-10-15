@@ -55,6 +55,7 @@ int main()
     std::cout << "Соединение с последней копией: " << s << std::endl;
     std::cout << "Копия теперь: " << s_copy << std::endl;
 
+
     stack r(s_copy + s);
     std::cout << "Соединение с копией (в новый стек r): " << r <<std::endl;
 
@@ -85,16 +86,43 @@ int main()
     std::cout << "Удаление первых 5 элементов: " << r << std::endl;
 
     r.rclean(3);
-    std::cout << "Удаление последних 3 элементов " << r << std::endl;
+    std::cout << "Удаление последних 3 элементов: " << r << std::endl;
 
     r.rclean(1);
-    std::cout << "Удаление последнего элемента " << r << std::endl;
+    std::cout << "Удаление последнего элемента: " << r << std::endl;
+
+    r.insert(-91);
+    std::cout << "Добение элемента в конец: " << r << std::endl;
+    std::cout << "Элемент в конце: " << r() << std::endl;
+
+    int e;
+    r.remove(e);
+    std::cout << "Удаление элеметна " << e << " (из конца): " << r <<std::endl; 
+
+    assert(r.is_not_empty());
 
     r.clean_safe(821);
     std::cout << "Безопасное удаление всех элементов: " << r << std::endl;
 
-    while(!s.is_empty()) s.pop(); 
+    assert(r.is_empty());
+
+    while(s.is_not_empty()) s.pop(); 
     std::cout << "Удаление с помощью pop: " << s << std::endl;
+
+    std::cout << "Добавление двух элементов: "<< s.push(6).push(7) << std::endl;
+    std::cout << "Удаление с конца: "<< s.rclean(1) << std::endl;
+    std::cout << "Ещё раз удаление с конца: " << s.rclean(1) << std::endl;
+
+    
+    std::cout << "Добавление трёх элементов: "<< s.push(6).push(7).push(8) << std::endl;
+    std::cout << "Удаление с конца трёх элементов: "<< s.rclean(3) << std::endl;
+
+    std::cout << "Безопасная вставка элемнтa: " << s.insert_safe(1, 9).insert_safe(2, 1).insert_safe(3, 0).insert_safe(0, 3) << std::endl;
+    while (s.is_not_empty())
+    {
+        s.remove_safe(2, e);
+        std::cout << "Безопасно удалён элемент с индексом 2 (" << e << "): " << s <<std::endl;
+    }
 
     /* Тесты выделения подстека */
     std::vector<int> a(10);
