@@ -56,9 +56,9 @@ public:
 
     bool operator == (const queue& b) const; /// Операция == по количеству элементов
 
-    bool is_empty () {if (head) return false; return true;} // Проверка на пустоту
+    bool is_empty () const {if (head) return false; return true;} // Проверка на пустоту
 
-    bool is_not_empty () {if (head) return true; return false;} // !is_empty
+    bool is_not_empty () const {if (head) return true; return false;} // !is_empty
 
     int& get_front () {return head->element;} // Получение элемента из вершины
 

@@ -9,7 +9,7 @@ int main()
 
     stack s;
 
-    s.push(1);s.push(2);s.push(3);s.push(4);
+    s.push({1, 2, 3, 4});
     std::cout << "Стек: " << s << std::endl;
 
     stack s_copy(s);
@@ -231,7 +231,10 @@ int main()
     std::cout << "Умножение на -3 стека " << s_new << ":  " << (s_new *= -3) << std::endl;
     std::cout << "Деление на 4 :  " << (s_new /= 4) << std::endl;
     r = s_new * 5;
-    std::cout << "Умножение на 5 :  " << r << std::endl;
+    std::cout << "Умножение на 5 :  " << r << std::endl << std::endl;
+
+    stack s1 = {1, 2, 3, 4, 5};
+    std::cout << "Инициализаторный список: " << s1 << std::endl;
 
 
     return 0;

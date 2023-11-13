@@ -2,6 +2,19 @@
 #include <vector>
 #include <time.h>
 
+
+stack::stack (std::initializer_list<int> list): top(NULL) /// Конструктор с инициализаторным списком
+{
+    node **in = &top;
+     for (auto &i: list)
+     {
+         *in = new node;
+         (*in)->element = i;
+         in = &((*in)->next);   
+     }
+}
+
+
 stack::stack (const stack& orig): top(NULL) /// Конструктор копирования
 {
     node **in_copy = &top; // Указатель на указатель, куда будет помещён новый узел
@@ -55,7 +68,7 @@ stack& stack::clean_safe (size_t len) /// Безопасное удаление первых len узлов
     node *n = top, *n_next;
     for (size_t i = 0; i < len; ++i)
     {
-        if (!(n_next = n->next)) i = len;
+    if (!(n_next = n->next)) i = len;
         delete n;
         n = n_next;
     }
@@ -563,3 +576,5 @@ stack& stack::substack_safe (long long beg, long long end, long long step) /// В
     return this->substack(beg, end, step);
 
 }
+
+

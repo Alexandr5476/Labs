@@ -1,6 +1,7 @@
 #ifndef STACK_H_INCLUDED
 #define STACK_H_INCLUDED
 
+#include <initializer_list>
 #include <ostream>
 #include <istream>
 
@@ -8,6 +9,8 @@ class stack
 {
 public:
     stack (): top(NULL) {} // Конструктор по умолчанию
+
+    stack (std::initializer_list<int> list); // Конструктор с инициализаторным списком
 
     stack (const stack& orig); // Конструктор копирования
 
@@ -56,15 +59,17 @@ public:
 
     bool operator == (const stack& s) const; // Операция == (по количеству элементов в стеке)
 
-    bool is_empty () {if (top) return false; return true;} // Проверка на пустоту
+    bool is_empty () const {if (top) return false; return true;} // Проверка на пустоту
 
-    bool is_not_empty () {if (top) return true; return false;} // !is_empty
+    bool is_not_empty () const {if (top) return true; return false;} // !is_empty
 
-    int& get_front () {return top->element;} // Получение элемента из вершины
+    int& get_front () {if (!top) throw -1; return top->element;} // Получение элемента из вершины
 
-    int get_front () const {return top->element;} // Получение элемента из вершины (const)
+    int get_front () const {if (!top) throw 1; return top->element;} // Получение элемента из вершины (const)
 
     stack& push (int e); // Добавление элемента
+
+    stack& push (std::initializer_list<int> list) {for (auto &i: list) this->push(i); return *this;} // push для нескольких элементов
 
     stack& pop (); // Удаление элемента
 

@@ -25,9 +25,63 @@ public:
 
     virtual size_t size() const = 0; // Размер списка
 
-    template<class M>
-    friend std::ostream& operator << (std::ostream& stream, const list<M>& l) {l.print(stream); return stream;} // Вывод
+    class iterator
+    {
+    public:
+        typedef typename list<T>::node node;
+        iterator (node *p = NULL): cur(p) {} // Конструктор
+        using iterator_category = std::forward_iterator_tag;
+        using value_type        = T;
+        using pointer           = T*;
+        using reference         = T&;
 
+        iterator operator ++ () {return cur = cur->next;}
+        iterator operator ++ (int) {node *p = cur; cur = cur->next; return p;}
+        reference operator * () const {return cur->element;}
+        pointer operator -> () const {return &(cur->element);}
+
+        bool operator == (const iterator& i) const {return cur == i.cur;}
+        bool operator == (const list<T>::const_iterator& i) const {return cur == i.cur;}
+
+    private:
+        node *cur;
+    };
+
+    class const_iterator
+    {
+    public:
+        typedef typename list<T>::node node;
+        const_iterator (node *p = NULL): cur(p) {} // Конструктор
+        using iterator_category = std::forward_iterator_tag;
+        using value_type        = T;
+        using pointer           = const T*;
+        using reference         = const T&;
+
+        const_iterator operator ++ () {return cur = cur->next;}
+        const_iterator operator ++ (int) {node *p = cur; cur = cur->next; return p;}
+        reference operator * () const {return cur->element;}
+        pointer operator -> () const {return &(cur->element);}
+
+        bool operator == (const const_iterator& i) const {return cur == i.cur;}
+        bool operator == (const iterator& i) const {return cur == i.cur;}
+
+        const_iterator operator = (const iterator i) {return cur = i.cur;}
+
+
+    private:
+        node *cur;
+    };
+
+    virtual iterator begin () = 0;
+    virtual iterator end () = 0;
+    virtual const_iterator begin () const {return cbegin();};
+    virtual const_iterator end () const {return cend();};
+    virtual const_iterator cbegin () const = 0;
+    virtual const_iterator cend () const = 0;
+
+    template<class M>
+    friend std::ostream& operator << (std::ostream& stream, const list<M>& l) //{for (typename list<M>::const_iterator i = l.cbegin(); i != l.cend(); ++i) stream << *i << " "; return stream;} // Вывод
+    {for (const auto &i: l) stream << i << " "; return stream;} // Вывод
     template<class M>
     friend std::istream& operator >> (std::istream& stream, list<M>& l) {M e; stream >> e; l.push(e); return stream;} // Ввод
 
@@ -40,15 +94,23 @@ protected:
         node *next;
         T element;
     };
-
-    virtual void print (std::ostream& stream) const = 0; // Печать  
 };
 
+/*template <class T>
+inline bool list<T>::iterator::operator == (const const_iterator& i) const {return cur == i.cur;}
+*/
 
 template<class T>
 class stack : public list<T>
 {
 public:
+    typedef typename list<T>::iterator iterator;
+    typedef typename list<T>::const_iterator const_iterator;
+    iterator begin () override {return iterator(top);}
+    iterator end () override {return iterator();}
+    const_iterator cbegin () const override {return const_iterator(top);}
+    const_iterator cend () const override {return const_iterator();}
+
     stack (): top(NULL) {} // Конструктор по умолчанию
 
     stack (std::initializer_list<T> list); // Конструктор с инициализаторным списком
@@ -75,8 +137,6 @@ public:
 
     stack& operator = (const stack& orig); // Операция присваивания
 
-    void print (std::ostream& stream) const override; // Печать
-
     stack& clean (); // Очистка стека
 
 private:
@@ -89,6 +149,13 @@ template<class T>
 class queue : public list<T>
 {
 public:
+    typedef typename list<T>::iterator iterator;
+    typedef typename list<T>::const_iterator const_iterator;
+    iterator begin () override {return iterator(head);}
+    iterator end () override {return iterator();}
+    const_iterator cbegin () const override {return const_iterator(head);}
+    const_iterator cend () const override {return const_iterator();}
+
     queue (): head(NULL), tail(NULL) {} // Конструктор по умолчанию
 
     queue (std::initializer_list<T> list): head(NULL), tail(NULL) {for (auto &i: list) this->push(i);} // Конструктор с инициализаторным списком
@@ -114,8 +181,6 @@ public:
     size_t size () const override{size_t i = 0; for (node *n = head; n; n = n->next) ++i; return i;} // Количесво элементов очереди
 
     queue& operator = (const queue& orig); // Операция присваивания
-
-    void print (std::ostream& stream) const override; // Печать
 
     queue& clean (); // Очистка очереди
 
@@ -178,16 +243,6 @@ queue<T>& queue<T>::operator = (const queue<T>& orig) /// Операция присваивания
         this->push(n->element);
 
     return *this;
-}
-
-template<class T>
-void queue<T>::print (std::ostream& stream) const /// Печать
-{
-    if (!head)
-        stream << "очередь пустая";
-    else
-        for (node *n = (head); n; n = n->next)
-            stream << n->element << " ";
 }
 
 template<class T>
@@ -302,16 +357,6 @@ stack<T>& stack<T>::clean () /// Очистка стека
 
     top = NULL;
     return *this;
-}
-
-template<class T>
-void stack<T>::print (std::ostream& stream) const /// Печать
-{
-    if (!(top))
-        stream << "стек пустой";
-    else
-        for (node *n = (top); n; n = n->next)
-            stream << n->element << " ";
 }
 
 #endif // LIST_H_INCLUDED

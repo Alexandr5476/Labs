@@ -13,6 +13,11 @@ try
     queue<int> q({12, 4, 7, -9, 2});
     std::cout << q << std::endl;
 
+    for (stack<int>::iterator i = s.begin(); i != s.end(); ++i)
+    {
+        std::cout << *i << "_";
+    }
+
     q.clean();
     q.get_front() = 5; 
 

@@ -386,8 +386,8 @@ queue& queue::remove (size_t i, int& e) /// Удаление и получение элемента по инд
     for (size_t j = 0; j < i - 1; ++j) n = n->next; // Доходим до узла, который будет перед удаляемым
 
     node *del = n->next, *n_next = del->next;
-    delete del;
     e = del->element;
+    delete del;
     if (!(n->next = n_next)) tail = n;
 
     return *this;
