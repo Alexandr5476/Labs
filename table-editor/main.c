@@ -1,11 +1,9 @@
 #include <stdio.h>
-#include <locale.h>
 #include "saving.h"
 #include "interface.h"
 
 int main(int argc, char **argv)
 {
-    setlocale (LC_CTYPE, "Russian");
 
     dtb list = {NULL, 0};
 

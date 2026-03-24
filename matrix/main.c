@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <locale.h>
+#include <stdio.h> 
 #include "matrix_abc.h"
 #include "matrix_init.h"
 #include "matrix_operations.h"
@@ -10,10 +9,8 @@ int main()
     size_t h, w;
     matrix *m, *f, *answer;
 
-    setlocale (LC_CTYPE, "Russian");
-
-    printf("Введите размер матрицы: ");
-    scanf("%Lu %Lu", &h, &w);
+    printf("Р’РІРµРґРёС‚Рµ СЂР°Р·РјРµСЂ РјР°С‚СЂРёС†С‹: ");
+    scanf("%zu %zu", &h, &w);
 
     if (!(m = matrix_alloc(h, w))) return 1;
     if (!(answer = matrix_alloc(h, 1)))
@@ -28,7 +25,7 @@ int main()
         return 1;
     }
 
-    printf("Введите матрицу:\n");
+    printf("Р’РІРµРґРёС‚Рµ РјР°С‚СЂРёС†Сѓ:\n");
     for (size_t i = 0; i < h; ++i)
         for (size_t j = 0; j < w; ++j)
         {
@@ -36,7 +33,7 @@ int main()
             scanf("%lf", e);
         }
 
-    printf("Введите правые части:\n");
+    printf("Р’РІРµРґРёС‚Рµ РїСЂР°РІС‹Рµ С‡Р°СЃС‚Рё:\n");
     for (size_t i = 0; i < h; ++i)
         {
             double *e = matrix_get(f, i, 0);
@@ -46,16 +43,16 @@ int main()
 
     if (matrix_gauss_method(m, f, answer))
     {
-        printf("Решение слу:\n\n");
+        printf("Р РµС€РµРЅРёРµ СЃР»Сѓ:\n\n");
         matrix_print(answer);
     }
-    else printf("Ошибка\n");
+    else printf("РћС€РёР±РєР°\n");
 
     matrix_free(m);
     matrix_free(f);
     matrix_free(answer);
 
-    printf("Матричная экспонента от\n");
+    printf("РњР°С‚СЂРёС‡РЅР°СЏ СЌРєСЃРїРѕРЅРµРЅС‚Р° РѕС‚\n");
 
     if (!(m = matrix_alloc_identity(3))) return 1;
 
@@ -63,7 +60,7 @@ int main()
     *matrix_get(m, 2, 2) = -1;
 
     matrix_print(m);
-    printf("Равна\n\n");
+    printf("Р Р°РІРЅР°\n\n");
 
     matrix_print(f = matrix_exp(m));
 
